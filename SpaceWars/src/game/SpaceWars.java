@@ -34,6 +34,7 @@ public class SpaceWars extends JFrame implements KeyListener {
 	
 	private ArrayList<Integer> keys = new ArrayList<Integer>();
 	private int counter = 0;
+	private int fireLimit = 0;
  
  
 	public static void main(String[] args) {
@@ -101,6 +102,8 @@ public class SpaceWars extends JFrame implements KeyListener {
 		} if (keys.contains(new Integer(40))) {
 			spaceship.decrementVelocity();
 			spaceship.decrementAngVelocity();
+		} if (keys.contains(new Integer(32))) {
+			spaceship.fireSimpleProjectile();
 		}
 		
 		if(spaceship.getVelocity() > 0)

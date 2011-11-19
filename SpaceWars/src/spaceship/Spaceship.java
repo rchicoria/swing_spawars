@@ -1,6 +1,13 @@
 package spaceship;
+
+import game.SpaceWars;
+
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
+
+import projectile.Projectile;
+import projectile.SimpleProjectile;
 
 public class Spaceship {
 	protected double x;
@@ -12,6 +19,7 @@ public class Spaceship {
 	private double maxVelocity;
 	private double maxAngVelocity;
 	protected Color color;
+	protected ArrayList<Projectile> projectiles = new ArrayList<Projectile>();
 	
 	double[][] spaceship = new double[8][2];
 	
@@ -47,6 +55,8 @@ public class Spaceship {
 		graphics.fillPolygon(shape);
 		graphics.setColor(Color.BLACK);
 		graphics.fillPolygon(shape2);
+		
+		drawSimpleProjectiles(graphics);
 	}
 	
 	/*
@@ -145,6 +155,27 @@ public class Spaceship {
 		oldPos.get(oldPos.size()-1)[1] = y;
 		if(oldPos.size()>5)
 			oldPos.remove(0);
+	}
+	
+	public void fireSimpleProjectile() {
+		try {
+			projectiles.add(new SimpleProjectile(spaceship[1][0], spaceship[1][1], direction));
+		} catch ( ConcurrentModificationException e) { }
+	}
+ 
+	private void drawSimpleProjectiles(Graphics graphics) {
+		try {
+			for(int n = 0; n < projectiles.size(); n++) {
+				SimpleProjectile p = (SimpleProjectile)projectiles.get(n);
+				p.move();
+				p.draw(graphics);
+				// check if this bullet is out of the screen, if so remove it from the list
+				if(p.getX()<0 || p.getX() > SpaceWars.windowWidth || p.getY()<0 || p.getY() > SpaceWars.windowHeight) {
+					projectiles.remove(p);
+				}
+ 
+			}
+		} catch ( ConcurrentModificationException e) { }
 	}
 	
 	// ====== private ======
