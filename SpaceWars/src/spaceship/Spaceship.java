@@ -20,12 +20,16 @@ public class Spaceship {
 	private double maxAngVelocity;
 	protected Color color;
 	protected ArrayList<Projectile> projectiles = new ArrayList<Projectile>();
+	protected Color simpleProjectileColor;
+	protected int maxEnergy;
+	protected int energy;
 	
 	double[][] spaceship = new double[8][2];
 	
 	ArrayList<double[]> oldPos = new ArrayList<double[]>();
  
-	public Spaceship(double x, double y, double velocity, double direction, double angVelocity, double acceleration, double maxVelocity, double maxAngVelocity) {
+	public Spaceship(double x, double y, double velocity, double direction, 
+			double angVelocity, double acceleration, double maxVelocity, double maxAngVelocity, int energy) {
 		this.x = x;
 		this.y = y;
 		this.velocity = velocity;
@@ -34,6 +38,8 @@ public class Spaceship {
 		this.acceleration = acceleration;
 		this.setMaxVelocity(maxVelocity);
 		this.setMaxAngVelocity(maxAngVelocity);
+		this.maxEnergy = energy;
+		this.energy = energy;
 		set(x, y);
 	}
 	
@@ -65,7 +71,7 @@ public class Spaceship {
 	public void rotate(double angle) {
 		this.direction += angle;
 		for(int i=0; i<7; i++){
-			spaceship[i] = movePoint(spaceship[i], spaceship[3], angle);
+			spaceship[i] = movePoint(spaceship[i], spaceship[7], angle);
 		}
 	}
 	
@@ -117,7 +123,7 @@ public class Spaceship {
 		spaceship[7][1] = y;
 	 
 		for(int i = 0; i < 7; i++) {
-			spaceship[i] = movePoint(spaceship[i], spaceship[3], direction);
+			spaceship[i] = movePoint(spaceship[i], spaceship[7], direction);
 		}
 	}
 	
@@ -159,21 +165,28 @@ public class Spaceship {
 	
 	public void fireSimpleProjectile() {
 		try {
-			projectiles.add(new SimpleProjectile(spaceship[1][0], spaceship[1][1], direction));
+			projectiles.add(new SimpleProjectile(spaceship[1][0], spaceship[1][1], direction, 5));
 		} catch ( ConcurrentModificationException e) { }
 	}
  
+	public ArrayList<Projectile> getProjectiles() {
+		return projectiles;
+	}
+
+	public void setProjectiles(ArrayList<Projectile> projectiles) {
+		this.projectiles = projectiles;
+	}
+
 	private void drawSimpleProjectiles(Graphics graphics) {
 		try {
 			for(int n = 0; n < projectiles.size(); n++) {
 				SimpleProjectile p = (SimpleProjectile)projectiles.get(n);
 				p.move();
-				p.draw(graphics);
+				p.draw(graphics, simpleProjectileColor);
 				// check if this bullet is out of the screen, if so remove it from the list
 				if(p.getX()<0 || p.getX() > SpaceWars.windowWidth || p.getY()<0 || p.getY() > SpaceWars.windowHeight) {
 					projectiles.remove(p);
 				}
- 
 			}
 		} catch ( ConcurrentModificationException e) { }
 	}
@@ -198,6 +211,16 @@ public class Spaceship {
 			(point[1] - origin[1]) * Math.cos(angle)));
 		double[] res = {X, Y};
 		return res;
+	}
+	
+	public void drawOldPos(Graphics graphics){
+		for(int i=0; i<getOldPos().size()-1; i++){
+			int x = (int)getOldPos().get(i)[0];
+			int y = (int)getOldPos().get(i)[1];
+	        graphics.setColor(getColor());
+	        graphics.drawOval(x, y, 5, 5);
+	        graphics.fillOval(x, y, 5, 5);
+		}
 	}
  
 	// getters and setters
@@ -263,5 +286,21 @@ public class Spaceship {
 
 	public void setColor(Color color) {
 		this.color = color;
+	}
+	
+	public int getMaxEnergy() {
+		return maxEnergy;
+	}
+
+	public void setMaxEnergy(int maxEnergy) {
+		this.maxEnergy = maxEnergy;
+	}
+
+	public int getEnergy() {
+		return energy;
+	}
+
+	public void setEnergy(int energy) {
+		this.energy = energy;
 	}
 }
