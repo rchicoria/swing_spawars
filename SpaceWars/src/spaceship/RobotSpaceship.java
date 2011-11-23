@@ -1,9 +1,14 @@
 package spaceship;
 
+import game.SpaceWars;
+
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Polygon;
+import java.util.ConcurrentModificationException;
 import java.util.Random;
+
+import projectile.SimpleProjectile;
 
 public class RobotSpaceship extends Spaceship {
 	
@@ -69,6 +74,20 @@ public class RobotSpaceship extends Spaceship {
 			y = 0;
 		}
 		set(x,y);
+	}
+	
+	protected void drawProjectiles(Graphics graphics) {
+		try {
+			for(int n = 0; n < projectiles.size(); n++) {
+				SimpleProjectile p = (SimpleProjectile)projectiles.get(n);
+				p.move();
+				p.draw(graphics, simpleProjectileColor);
+				// check if this bullet is out of the screen, if so remove it from the list
+				if(p.getX()<0 || p.getX() > SpaceWars.windowWidth || p.getY()<0 || p.getY() > SpaceWars.windowHeight) {
+					projectiles.remove(p);
+				}
+			}
+		} catch ( ConcurrentModificationException e) { }
 	}
 
 	public double getCurrentProb() {

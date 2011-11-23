@@ -1,6 +1,7 @@
 package game;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Polygon;
@@ -16,6 +17,10 @@ import java.util.Random;
 import javax.swing.JFrame;
 import javax.swing.Timer;
 
+import pack.EnergyPack;
+import pack.Pack;
+import pack.ProjectilePack;
+import projectile.GuidedProjectile;
 import projectile.Projectile;
 
 import spaceship.*;
@@ -24,6 +29,7 @@ import spaceship.*;
 public class SpaceWars extends JFrame implements KeyListener {
  
 	/**
+	 * @author João Claro
 	 * @author Ricardo Lopes
 	 * @author Rui Chicória
 	 */
@@ -36,11 +42,11 @@ public class SpaceWars extends JFrame implements KeyListener {
 	
 	private UserSpaceship spaceship;
 	private ArrayList<RobotSpaceship> robotSpaceships;
+	private ArrayList<Pack> packs;
 	
 	private ArrayList<Integer> keys = new ArrayList<Integer>();
 	private int counter = 0;
 	private int fireLimit = 0;
-	private int fire = 0;
  
  
 	public static void main(String[] args) {
@@ -64,6 +70,9 @@ public class SpaceWars extends JFrame implements KeyListener {
 			public void actionPerformed(ActionEvent actionEvent) {
 				counter++;
 				counter%=12;
+				fireLimit++;
+				if(fireLimit>12)
+					fireLimit=12;
 				gameLoop();
 			}
 	    };
@@ -76,8 +85,9 @@ public class SpaceWars extends JFrame implements KeyListener {
 	 * Inicialização das variáveis relacionadas com o jogo
 	 */
 	private void initGame() {
-		spaceship = new UserSpaceship(windowWidth/2, windowHeight/2, 0, 0, 0, 0.2, 10, 0.2, 100);
+		spaceship = new UserSpaceship(windowWidth/2, windowHeight/2, 0, 0, 0, 0.2, 10, 0.2, 100, 100, 3);
 		robotSpaceships = new ArrayList<RobotSpaceship>();
+		packs = new ArrayList<Pack>();
 		robotPos[0][0] = 70; 
 		robotPos[0][1] = 70;
 		robotPos[0][2] = 0;
@@ -121,9 +131,9 @@ public class SpaceWars extends JFrame implements KeyListener {
 						if(op.distance(rp) <= 60 && i<=200)
 							robot.rotate(-robot.getAngVelocity());
 					}
-				}
-					
+				}		
 			}
+			
 	        if(collision)
 	        	robot.setFireActive(true);
 	        else
@@ -140,17 +150,41 @@ public class SpaceWars extends JFrame implements KeyListener {
 		} if (keys.contains(new Integer(40))) {
 			spaceship.decrementVelocity();
 			spaceship.decrementAngVelocity();
-		} if (keys.contains(new Integer(32))) {
+		} if (keys.contains(new Integer(32)) && spaceship.getAmmo()>0) {
 			spaceship.fireSimpleProjectile();
+			spaceship.setAmmo(spaceship.getAmmo()-1);
+		} if (keys.contains(KeyEvent.VK_ALT) && spaceship.getRocketsAmmo()>0 && fireLimit==12) {
+				RobotSpaceship currentTarget = null;
+				double min = 800;
+				for(int i=0; i<800; i++)
+					for(int j=0; j<robotSpaceships.size(); j++){
+						RobotSpaceship robot = robotSpaceships.get(j);
+						double dx = i*Math.cos(spaceship.getDirection()+0.5 * Math.PI);
+						double dy = i*Math.sin(spaceship.getDirection()+0.5 * Math.PI);
+						int posX = (int)(spaceship.getX()+dx);
+						int posY = (int)(spaceship.getY()+dy);
+			        	Point sp = new Point((int)posX, (int)posY);
+						Point rp = new Point((int)robot.getX(), (int)robot.getY());
+						if(sp.distance(rp) <= min) {
+							min=sp.distance(rp);
+							currentTarget = robot;		
+						}
+					}
+				System.out.println(currentTarget);
+				spaceship.fireGuidedProjectile(currentTarget);
+				spaceship.setRocketsAmmo(spaceship.getRocketsAmmo()-1);
+				fireLimit=0;
 		}
 		
 		
 		if(spaceship.getVelocity() > 0)
 			spaceship.move();
 		
+		// guarda as posições anteriores
 		if(counter==0 || counter==6)
 			spaceship.savePos();
 		
+		// movimento das naves robot
 		for(int i=0; i<robotSpaceships.size(); i++){
 			robotSpaceships.get(i).incrementVelocity();
 			robotSpaceships.get(i).incrementAngVelocity();
@@ -166,35 +200,128 @@ public class SpaceWars extends JFrame implements KeyListener {
 			}
 		}
 		
+		// decrement pack's remaining time
+		for(int n = 0; n < packs.size(); n++) {
+			Pack p = packs.get(n);
+			p.setTimeRemaining(p.getTimeRemaining()-1);
+			if(p.getTimeRemaining()<=0)
+				packs.remove(p);
+		}
+		
+		// decrement rockets' remaining time
+		for(int n = 0; n < spaceship.getGuidedProjectiles().size(); n++) {
+			GuidedProjectile p = spaceship.getGuidedProjectiles().get(n);
+			p.setRemainingTime(p.getRemainingTime()-1);
+			if(p.getRemainingTime()<=0)
+				spaceship.getGuidedProjectiles().remove(p);
+		}
+		
+		// create packs
+		Random random = new Random();
+		double prob = random.nextDouble();
+		if(prob < 0.0003)
+			packs.add(new EnergyPack(30));
+		else if( prob < 0.003)
+			packs.add(new ProjectilePack(100));
+		
+		
 		// check for collision between robots and projectiles
-		for(Projectile s:spaceship.getProjectiles()) {
-			for(int n = 0; n < robotSpaceships.size(); n++) {
-				RobotSpaceship r = robotSpaceships.get(n);
-				Point sp = new Point((int)s.getX(), (int)s.getY());
-				Point rp = new Point((int)r.getX(), (int)r.getY());
-				if(sp.distance(rp) <= 20) {
-					r.setEnergy(r.getEnergy()-s.getDamage());
-					if(r.getEnergy()<=0){
-						robotSpaceships.remove(n);
-						r.setEnergy(0);
-						if(robotSpaceships.size()==0)
-							initGame();
+		try{
+			for(int i=spaceship.getProjectiles().size()-1; i>=0; i--) {
+				Projectile s = spaceship.getProjectiles().get(i);
+				for(int n = 0; n < robotSpaceships.size(); n++) {
+					RobotSpaceship r = robotSpaceships.get(n);
+					Point sp = new Point((int)s.getX(), (int)s.getY());
+					Point rp = new Point((int)r.getX(), (int)r.getY());
+					if(sp.distance(rp) <= 20) {
+						r.setEnergy(r.getEnergy()-s.getDamage());
+						spaceship.getProjectiles().remove(s);
+						if(r.getEnergy()<=0){
+							robotSpaceships.remove(n);
+							r.setEnergy(0);
+							if(robotSpaceships.size()==0){
+								initGame();
+								break;
+							}
+						}
 					}
 				}
 			}
+		} catch(IndexOutOfBoundsException ex)
+		{
+			
+		}
+		
+		// check for collision between robots and guided projectiles
+		try{
+			for(int i=spaceship.getGuidedProjectiles().size()-1; i>=0; i--) {
+				Projectile s = spaceship.getGuidedProjectiles().get(i);
+				for(int n = 0; n < robotSpaceships.size(); n++) {
+					RobotSpaceship r = robotSpaceships.get(n);
+					Point sp = new Point((int)s.getX(), (int)s.getY());
+					Point rp = new Point((int)r.getX(), (int)r.getY());
+					if(sp.distance(rp) <= 20) {
+						r.setEnergy(r.getEnergy()-s.getDamage());
+						spaceship.getGuidedProjectiles().remove(s);
+						if(r.getEnergy()<=0){
+							robotSpaceships.remove(n);
+							r.setEnergy(0);
+							if(robotSpaceships.size()==0){
+								initGame();
+								break;
+							}
+						}
+					}
+				}
+			}
+		} catch(IndexOutOfBoundsException ex)
+		{
+			
 		}
 		
 		// check for collision between user and projectiles
-		for(int n = 0; n < robotSpaceships.size(); n++) {
-			RobotSpaceship r = robotSpaceships.get(n);
-			for(Projectile p:r.getProjectiles()) {
+		try{
+			for(int n = 0; n < robotSpaceships.size(); n++) {
+				RobotSpaceship r = robotSpaceships.get(n);
+				for(int i=r.getProjectiles().size()-1; i>=0; i--) {
+					Projectile p = r.getProjectiles().get(i);
+					Point sp = new Point((int)spaceship.getX(), (int)spaceship.getY());
+					Point pp = new Point((int)p.getX(), (int)p.getY());
+					if(sp.distance(pp) <= 20) {
+						spaceship.setEnergy(spaceship.getEnergy()-p.getDamage());
+						r.getProjectiles().remove(p);
+						if(spaceship.getEnergy()<=0){
+							initGame();
+							break;
+						}
+					}
+				}
+			}
+		} 
+			catch(IndexOutOfBoundsException ex)
+		{
+			
+		}
+		
+		// check for collision between user and packs
+		for(int n = 0; n < packs.size(); n++) {
+			try{
+				EnergyPack p = (EnergyPack) packs.get(n);
 				Point sp = new Point((int)spaceship.getX(), (int)spaceship.getY());
 				Point pp = new Point((int)p.getX(), (int)p.getY());
-				if(sp.distance(pp) <= 20) {
-					spaceship.setEnergy(spaceship.getEnergy()-p.getDamage());
-					if(spaceship.getEnergy()<=0){
-						initGame();
-					}
+				if(sp.distance(pp) <= 30){
+					spaceship.setEnergy(spaceship.getEnergy()+p.getAmount());
+					if(spaceship.getEnergy()>spaceship.getMaxEnergy())
+						spaceship.setEnergy(spaceship.getMaxEnergy());
+					packs.remove(p);
+				}
+			} catch(ClassCastException ex) {
+				ProjectilePack p = (ProjectilePack) packs.get(n);
+				Point sp = new Point((int)spaceship.getX(), (int)spaceship.getY());
+				Point pp = new Point((int)p.getX(), (int)p.getY());
+				if(sp.distance(pp) <= 30){
+					spaceship.setAmmo(spaceship.getAmmo()+p.getAmount());
+					packs.remove(p);
 				}
 			}
 		}
@@ -215,6 +342,9 @@ public class SpaceWars extends JFrame implements KeyListener {
 			graphics.setColor(Color.BLACK);
 			graphics.fillRect(0, 0, windowWidth, windowHeight);
 			
+			for(int i=0; i<packs.size(); i++)
+				packs.get(i).draw(graphics);
+			
 			spaceship.drawOldPos(graphics);
 			
 			for(int i=0; i<robotSpaceships.size(); i++){
@@ -223,6 +353,7 @@ public class SpaceWars extends JFrame implements KeyListener {
 				robot.drawOldPos(graphics);
 				robot.drawBar(graphics);
 			}
+			
 			spaceship.draw(graphics);
 			
 			Polygon bar = new Polygon();
@@ -246,6 +377,15 @@ public class SpaceWars extends JFrame implements KeyListener {
 			else
 				graphics.setColor(Color.RED);
 			graphics.fillPolygon(bar2);
+			
+			// show ammo
+			graphics.setColor(Color.WHITE);
+			graphics.setFont(new Font("Arial", 20, 30));
+			graphics.drawString("Ammo: " + spaceship.getAmmo(), 10, 575);
+			graphics.setColor(Color.WHITE);
+			graphics.setFont(new Font("Arial", 20, 30));
+			graphics.drawString("Rockets: " + spaceship.getRocketsAmmo(), 10, 540);
+			
 		} finally {
 			graphics.dispose();
 		}
