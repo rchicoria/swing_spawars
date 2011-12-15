@@ -2,16 +2,14 @@ package spaceship;
 
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
 
-import projectile.GuidedProjectile;
 
 public class UserSpaceship extends Spaceship {
-	
-	protected int ammo;
-	protected int rockets;
+    private State state;
+    protected int ammo;
+    protected int rockets;
 
 	protected ArrayList<GuidedProjectile> guidedProjectiles;
 
@@ -20,10 +18,15 @@ public class UserSpaceship extends Spaceship {
 		this.ammo = ammo;
 		this.rockets = rockets;
 		this.color = Color.RED;
-		this.simpleProjectileColor = Color.WHITE;
+                this.state = new State_Default();
 		this.guidedProjectiles = new ArrayList<GuidedProjectile>();
-		// TODO Auto-generated constructor stub
 	}
+        
+        public void takeDamage(int damage)
+        {
+            this.state.takeDamage(this, damage);
+        }
+
 	
 	public ArrayList<GuidedProjectile> getGuidedProjectiles() {
 		return guidedProjectiles;
@@ -65,46 +68,32 @@ public class UserSpaceship extends Spaceship {
 		} catch ( ConcurrentModificationException e) { }
 	}
 
-	public int get_ammo() {
-		return ammo;
-	}
 
-	public void set_ammo(int ammo) {
-		if(ammo>=0)
-                    this.ammo = ammo;
-	}
-	
-	public int getrockets() {
-		return rockets;
-	}
+    public State getState() {
+        return state;
+    }
 
-	public void setrockets(int rockets) {
-		this.rockets = rockets;
-	}
+    public void setState(State state) {
+        this.state = state;
+    }
 
+    public int get_ammo() {
+            return ammo;
+    }
 
+    public void set_ammo(int ammo) {
+            if(ammo>=0)
+                this.ammo = ammo;
+    }
 
+    public int getrockets() {
+            return rockets;
+    }
 
-        public void keyPressed(KeyEvent e)
-        {
-            int key = e.getKeyCode();
+    public void setrockets(int rockets) {
+            this.rockets = rockets;
+    }
 
-            if (key == KeyEvent.VK_LEFT) {
-                rotate(1);
-            }
-
-            if (key == KeyEvent.VK_RIGHT) {
-                rotate(-1);
-            }
-
-            if (key == KeyEvent.VK_UP) {
-                speed_up();
-            }
-
-            if (key == KeyEvent.VK_DOWN) {
-                speed_down();
-            }
-        }
 
 
 }

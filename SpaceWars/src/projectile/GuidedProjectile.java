@@ -1,5 +1,6 @@
 package projectile;
 
+import game.ContainerBox;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Point;
@@ -83,6 +84,8 @@ public class GuidedProjectile extends Projectile {
 	 * Move todos os pontos da nave espacial à velocidade da mesma
 	 */
 	public void move() {
+                if(target == null)
+                    return;
 		// guarda a shape actual
 		double [][] temp = new double[6][2];
 		for(int i=0; i<6; i++){
@@ -104,7 +107,7 @@ public class GuidedProjectile extends Projectile {
 			front[i][1] += dyfront;
 		}
 		Point pp1 = new Point((int)front[5][0], (int)front[5][1]);
-		Point rp = new Point((int)target.getX(), (int)target.getY());
+		Point rp = new Point((int)target.get_x(), (int)target.get_y());
 		double dist1 = pp1.distance(rp);
 		
 		// experimenta rodar para um lado e vê se está mais perto
@@ -151,13 +154,13 @@ public class GuidedProjectile extends Projectile {
 		y = (int)pos[4][1];
  
 		if(x <= 0) {
-			x = game.SpaceWars.windowWidth;
-		} else if (x >= game.SpaceWars.windowWidth+20) {
+			x = ContainerBox.getInstance().get_maxX();
+		} else if (x >= ContainerBox.getInstance().get_maxX()+20) {
 			x = 0;
 		}
 		if(y <= 0) {
-			y = game.SpaceWars.windowHeight;
-		} else if(y >= game.SpaceWars.windowHeight) {
+			y = ContainerBox.getInstance().get_maxY();
+		} else if(y >= ContainerBox.getInstance().get_maxY()) {
 			y = 0;
 		}
 		set(x,y);

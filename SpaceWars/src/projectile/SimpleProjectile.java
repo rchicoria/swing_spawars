@@ -10,18 +10,21 @@ public class SimpleProjectile extends Projectile {
 		// TODO Auto-generated constructor stub
 	}
 
-	public void draw(Graphics g, Color color) {
-		g.setColor(color);
-		g.fillOval((int)x, (int)y, 5, 5);
-		g.drawOval((int)x, (int)y, 5, 5);
+	public void draw(Graphics g, Color color)
+        {
+            g.setColor(color);
+            g.fillOval((int)x, (int)y, 5, 5);
+            g.drawOval((int)x, (int)y, 5, 5);
 	}
  
-	public void move() {
-		double dx = 20*Math.cos(direction+0.5 * Math.PI);
-		double dy = 20*Math.sin(direction+0.5 * Math.PI);
- 
-		x += dx;
-		y += dy;
+	public void move()
+        {
+            double dx = 20*Math.cos(direction);
+            double dy = 20*Math.sin(direction);
+            //System.out.println("x: " + x + " , y: " + y + ". dx: " + dx + " , dy:" + dy);
+            
+            x += dx;
+            y -= dy;
 	}
  
 }

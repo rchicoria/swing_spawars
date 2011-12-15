@@ -25,19 +25,19 @@ public class Projectile {
 	}
 	
 	// getters and setters
-	public double getX() {
+	public double get_x() {
 		return x;
 	}
  
-	public void setX(double x) {
+	public void set_x(double x) {
 		this.x = x;
 	}
  
-	public double getY() {
+	public double get_y() {
 		return y;
 	}
  
-	public void setY(double y) {
+	public void set_y(double y) {
 		this.y = y;
 	}
  
