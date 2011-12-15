@@ -1,0 +1,15 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+package views;
+
+/**
+ *
+ * @author alpha
+ */
+public class SimpleView
+{
+    public void update() {};
+}

@@ -114,8 +114,9 @@ public class Spaceship
         //System.out.println("Direccao nave: " + this.angle_degrees);
         // Box limits for projectiles
         try {
-            for(Projectile p: projectiles)
+            for(int i = 0; i<projectiles.size(); i++)
             {
+                Projectile p = projectiles.get(i);
                 p.move();
                 //System.out.println("Direccao tiro: " + p.getDirection());
                 // check if this bullet is out of the screen, if so remove it from the list
@@ -170,20 +171,20 @@ public class Spaceship
    public void set(float x, float y)
    {
         float y_offset = 5;
-        shape[0][0] = (float)x-20;
-        shape[0][1] = (float)y-20+y_offset;
-        shape[1][0] = (float)x;
-        shape[1][1] = (float)y+20+y_offset;
-        shape[2][0] = (float)x+20;
-        shape[2][1] = (float)y-20+y_offset;
-        shape[3][0] = (float)x;
-        shape[3][1] = (float)y-15+y_offset;
-        shape[4][0] = (float)x-12;
-        shape[4][1] = (float)y-10+y_offset;
-        shape[5][0] = (float)x+12;
-        shape[5][1] = (float)y-10+y_offset;
-        shape[6][0] = (float)x;
-        shape[6][1] = (float)y+15+y_offset;
+        shape[0][0] = x-20;
+        shape[0][1] = y-20+y_offset;
+        shape[1][0] = x;
+        shape[1][1] = y+20+y_offset;
+        shape[2][0] = x+20;
+        shape[2][1] = y-20+y_offset;
+        shape[3][0] = x;
+        shape[3][1] = y-15+y_offset;
+        shape[4][0] = x-12;
+        shape[4][1] = y-10+y_offset;
+        shape[5][0] = x+12;
+        shape[5][1] = y-10+y_offset;
+        shape[6][0] = x;
+        shape[6][1] = y+15+y_offset;
         shape[7][0] = x;
         shape[7][1] = y+y_offset;
 
@@ -343,8 +344,8 @@ public class Spaceship
     {
         try
         {
-            if(projectiles.size()<20)
-            projectiles.add(new SimpleProjectile(shape[1][0], shape[1][1], Math.toRadians(this.angle_degrees), 5));
+            SimpleProjectile sp = new SimpleProjectile(x, y, Math.toRadians(this.angle_degrees), 5);
+            projectiles.add(sp);
         }
         catch ( ConcurrentModificationException e) { }
     }
@@ -378,6 +379,7 @@ public class Spaceship
    }
 
    /** Describe itself. */
+    @Override
    public String toString() {
       sb.delete(0, sb.length());
       formatter.format("@(%3.0f,%3.0f) r=%3.0f V=(%3.0f,%3.0f) " +

@@ -45,6 +45,8 @@ public class Spaceship implements Spaceship_I
         this.max_energy = energy;
    }
 
+   public void attachView() {};
+
    // Getters and Setters
 
     public double getAcceleration() {

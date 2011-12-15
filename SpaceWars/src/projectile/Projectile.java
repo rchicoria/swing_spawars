@@ -4,12 +4,12 @@ import java.awt.Color;
 import java.awt.Graphics;
 
 public class Projectile {
-	protected double x;
-	protected double y;
+	protected float x;
+	protected float y;
 	protected double direction;
 	protected int damage;
 	
-	public Projectile(double x, double y, double direction, int damage){
+	public Projectile(float x, float y, double direction, int damage){
 		this.x = x;
 		this.y = y;
 		this.direction = direction;
@@ -25,19 +25,19 @@ public class Projectile {
 	}
 	
 	// getters and setters
-	public double get_x() {
+	public float get_x() {
 		return x;
 	}
  
-	public void set_x(double x) {
+	public void set_x(float x) {
 		this.x = x;
 	}
  
-	public double get_y() {
+	public float get_y() {
 		return y;
 	}
  
-	public void set_y(double y) {
+	public void set_y(float y) {
 		this.y = y;
 	}
  

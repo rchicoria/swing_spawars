@@ -15,10 +15,10 @@ public interface Commons {
     public static final float EPSILON_TIME = 1e-2f;
     
     public static final int N_ROBOTS = 4;
-    public static final int USER_SPACESHIP_INIT_X = 280;
-    public static final int USER_SPACESHIP_INIT_Y = 500;
+    public static final int USER_SPACESHIP_INIT_X = 400;
+    public static final int USER_SPACESHIP_INIT_Y = 300;
     public static final int USER_SPACESHIP_RADIUS = 15;
-    public static final int USER_SPACESHIP_INIT_SPEED = 2;
+    public static final int USER_SPACESHIP_INIT_SPEED = 0;
     public static final int USER_SPACESHIP_DIRECTION = 90;
     public static final Color USER_SPACESHIP_COLOR = Color.RED;
     public static final int USER_SPACESHIP_ENERGY = 100;

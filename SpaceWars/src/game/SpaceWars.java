@@ -101,6 +101,8 @@ public class SpaceWars extends JFrame implements KeyListener, Commons {
                                                 USER_SPACESHIP_AMMO,
                                                 USER_SPACESHIP_ROCKETS);
             
+            
+            
             robot_spaceships = new ArrayList<RobotSpaceship>();
 
             robot_spaceships_pos[0][0] = 70;
@@ -160,6 +162,7 @@ public class SpaceWars extends JFrame implements KeyListener, Commons {
                     }
                     robot_spaceships.get(i).update(tMin);
                 }
+                user_spaceship.update(tMin);
                 timeLeft -= tMin;                // Subtract the time consumed and repeat
         } while (timeLeft > EPSILON_TIME);  // Ignore remaining time less than threshold
 
@@ -214,7 +217,7 @@ public class SpaceWars extends JFrame implements KeyListener, Commons {
 		}
 
                 // Fire Rockets
-                if (keys.contains(KeyEvent.VK_C) && user_spaceship.getRocketsAmmo()>0 && fireLimit==12)
+                if (keys.contains(KeyEvent.VK_C) && user_spaceship.getrockets()>0 && fireLimit==12)
                 {
                         RobotSpaceship currentTarget = null;
                         double min = 800;
@@ -236,7 +239,7 @@ public class SpaceWars extends JFrame implements KeyListener, Commons {
                                 }
                         System.out.println(currentTarget);
                         user_spaceship.fireGuidedProjectile(currentTarget);
-                        user_spaceship.setRocketsAmmo(user_spaceship.getRocketsAmmo()-1);
+                        user_spaceship.setrockets(user_spaceship.getrockets()-1);
                         fireLimit=0;
 		}
 		
@@ -257,7 +260,7 @@ public class SpaceWars extends JFrame implements KeyListener, Commons {
 
                         if(counter==0 || counter == 6)
                             robot_spaceships.get(i).savePos();
-
+                            
                         if(robot_spaceships.get(i).isFireActive())
                         {
                             Random random = new Random();
@@ -393,7 +396,6 @@ public class SpaceWars extends JFrame implements KeyListener, Commons {
 				}
 			}
 		}
-		user_spaceship.update(TOP_ALIGNMENT);
 		// so much for game logic now let's draw already!
 		draw_frame();
 	}
@@ -447,7 +449,7 @@ public class SpaceWars extends JFrame implements KeyListener, Commons {
                     graphics.drawString("Ammo: " + user_spaceship.get_ammo(), 10, 575);
                     graphics.setColor(Color.WHITE);
                     graphics.setFont(new Font("Arial", 20, 30));
-                    graphics.drawString("Rockets: " + user_spaceship.getRocketsAmmo(), 10, 540);
+                    graphics.drawString("Rockets: " + user_spaceship.getrockets(), 10, 540);
 
             }
             finally

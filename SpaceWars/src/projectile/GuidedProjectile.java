@@ -16,7 +16,7 @@ public class GuidedProjectile extends Projectile {
 	RobotSpaceship target;
 	int remainingTime;
 	
-	public GuidedProjectile(double x, double y, double direction, int damage, RobotSpaceship target) {
+	public GuidedProjectile(float x, float y, double direction, int damage, RobotSpaceship target) {
 		super(x, y, direction, damage);
 		this.target = target;
 		this.set(x, y);
