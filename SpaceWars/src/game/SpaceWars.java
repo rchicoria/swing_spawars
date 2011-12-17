@@ -20,7 +20,7 @@ import javax.swing.Timer;
 import pack.EnergyPack;
 import pack.Pack;
 import pack.ProjectilePack;
-import projectile.GuidedProjectile;
+import projectile.RocketProjectile;
 import projectile.Projectile;
 import spaceship.*;
 
@@ -209,38 +209,38 @@ public class SpaceWars extends JFrame implements KeyListener, Commons {
 			user_spaceship.speed_up();
 		if (keys.contains(KEY_DOWN))
 			user_spaceship.speed_down();
-                // Fire Simple Projectiles
-                if (keys.contains(KEY_AMMO))
-                {
-                    user_spaceship.fire_projectiles();
-                    user_spaceship.set_ammo(user_spaceship.get_ammo()-1);
+        // Fire Simple Projectiles
+        if (keys.contains(KEY_AMMO))
+        {
+            user_spaceship.fireProjectile(null);
+            user_spaceship.setAmmo(user_spaceship.getAmmo()-1);
 		}
 
-                // Fire Rockets
-                if (keys.contains(KeyEvent.VK_C) && user_spaceship.getrockets()>0 && fireLimit==12)
-                {
-                        RobotSpaceship currentTarget = null;
-                        double min = 800;
-                        for(int i=0; i<800; i++)
-                                for(int j=0; j<robot_spaceships.size(); j++)
+        // Fire Rockets
+        if (keys.contains(KeyEvent.VK_C) && user_spaceship.getrockets()>0 && fireLimit==12)
+        {
+                RobotSpaceship currentTarget = null;
+                double min = 800;
+                for(int i=0; i<800; i++)
+                        for(int j=0; j<robot_spaceships.size(); j++)
+                        {
+                                RobotSpaceship robot = robot_spaceships.get(j);
+                                double dx = i*Math.cos(user_spaceship.get_direction_radians()+0.5 * Math.PI);
+                                double dy = i*Math.sin(user_spaceship.get_direction_radians()+0.5 * Math.PI);
+                                int posX = (int)(user_spaceship.getX()+dx);
+                                int posY = (int)(user_spaceship.getY()+dy);
+                                Point sp = new Point((int)posX, (int)posY);
+                                Point rp = new Point((int)robot.getX(), (int)robot.getY());
+                                if(sp.distance(rp) <= min)
                                 {
-                                        RobotSpaceship robot = robot_spaceships.get(j);
-                                        double dx = i*Math.cos(user_spaceship.get_direction_radians()+0.5 * Math.PI);
-                                        double dy = i*Math.sin(user_spaceship.get_direction_radians()+0.5 * Math.PI);
-                                        int posX = (int)(user_spaceship.get_x()+dx);
-                                        int posY = (int)(user_spaceship.get_y()+dy);
-                                        Point sp = new Point((int)posX, (int)posY);
-                                        Point rp = new Point((int)robot.get_x(), (int)robot.get_y());
-                                        if(sp.distance(rp) <= min)
-                                        {
-                                            min = sp.distance(rp);
-                                            currentTarget = robot;
-                                        }
+                                    min = sp.distance(rp);
+                                    currentTarget = robot;
                                 }
-                        System.out.println(currentTarget);
-                        user_spaceship.fireGuidedProjectile(currentTarget);
-                        user_spaceship.setrockets(user_spaceship.getrockets()-1);
-                        fireLimit=0;
+                        }
+                System.out.println(currentTarget);
+                user_spaceship.fireProjectile(currentTarget);
+                user_spaceship.setrockets(user_spaceship.getrockets()-1);
+                fireLimit=0;
 		}
 		
 		
@@ -265,7 +265,7 @@ public class SpaceWars extends JFrame implements KeyListener, Commons {
                         {
                             Random random = new Random();
                             if(random.nextDouble() < ROBOT_SPACESHIP_FIRE_RATE)
-                                robot_spaceships.get(i).fire_projectiles();
+                                robot_spaceships.get(i).fireProjectile(null);
 			}
 		}
 		
@@ -279,12 +279,16 @@ public class SpaceWars extends JFrame implements KeyListener, Commons {
 		}
 		
 		// decrement rockets' remaining time
-		for(int n = 0; n < user_spaceship.getGuidedProjectiles().size(); n++)
-                {
-			GuidedProjectile p = user_spaceship.getGuidedProjectiles().get(n);
-			p.setRemainingTime(p.getRemainingTime()-1);
-			if(p.getRemainingTime()<=0)
-				user_spaceship.getGuidedProjectiles().remove(p);
+		for(int n = 0; n < user_spaceship.getProjectiles().size(); n++)
+        {
+			try{
+				RocketProjectile p = (RocketProjectile) user_spaceship.getProjectiles().get(n);
+				p.setRemainingTime(p.getRemainingTime()-1);
+				if(p.getRemainingTime()<=0)
+					user_spaceship.getGuidedProjectiles().remove(p);
+			} catch (ClassCastException ex){
+				
+			}
 		}
 		
 		// create packs
@@ -303,7 +307,7 @@ public class SpaceWars extends JFrame implements KeyListener, Commons {
 				for(int n = 0; n < robot_spaceships.size(); n++) {
 					RobotSpaceship r = robot_spaceships.get(n);
 					Point sp = new Point((int)s.get_x(), (int)s.get_y());
-					Point rp = new Point((int)r.get_x(), (int)r.get_y());
+					Point rp = new Point((int)r.getX(), (int)r.getY());
 					if(sp.distance(rp) <= 20) {
 						r.setEnergy(r.getEnergy()-s.getDamage());
 						user_spaceship.getProjectiles().remove(s);
@@ -323,32 +327,32 @@ public class SpaceWars extends JFrame implements KeyListener, Commons {
 			
 		}
 		
-		// check for collision between robots and guided projectiles
-		try{
-			for(int i=user_spaceship.getGuidedProjectiles().size()-1; i>=0; i--) {
-				Projectile s = user_spaceship.getGuidedProjectiles().get(i);
-				for(int n = 0; n < robot_spaceships.size(); n++) {
-					RobotSpaceship r = robot_spaceships.get(n);
-					Point sp = new Point((int)s.get_x(), (int)s.get_y());
-					Point rp = new Point((int)r.get_x(), (int)r.get_y());
-					if(sp.distance(rp) <= 20) {
-						r.setEnergy(r.getEnergy()-s.getDamage());
-						user_spaceship.getGuidedProjectiles().remove(s);
-						if(r.getEnergy()<=0){
-							robot_spaceships.remove(n);
-							r.setEnergy(0);
-							if(robot_spaceships.size()==0){
-								initGame();
-								break;
-							}
-						}
-					}
-				}
-			}
-		} catch(IndexOutOfBoundsException ex)
-		{
-			
-		}
+//		// check for collision between robots and guided projectiles
+//		try{
+//			for(int i=user_spaceship.getGuidedProjectiles().size()-1; i>=0; i--) {
+//				Projectile s = user_spaceship.getGuidedProjectiles().get(i);
+//				for(int n = 0; n < robot_spaceships.size(); n++) {
+//					RobotSpaceship r = robot_spaceships.get(n);
+//					Point sp = new Point((int)s.get_x(), (int)s.get_y());
+//					Point rp = new Point((int)r.getX(), (int)r.getY());
+//					if(sp.distance(rp) <= 20) {
+//						r.setEnergy(r.getEnergy()-s.getDamage());
+//						user_spaceship.getGuidedProjectiles().remove(s);
+//						if(r.getEnergy()<=0){
+//							robot_spaceships.remove(n);
+//							r.setEnergy(0);
+//							if(robot_spaceships.size()==0){
+//								initGame();
+//								break;
+//							}
+//						}
+//					}
+//				}
+//			}
+//		} catch(IndexOutOfBoundsException ex)
+//		{
+//			
+//		}
 		
 		// check for collision between user and projectiles
 		try{
@@ -356,7 +360,7 @@ public class SpaceWars extends JFrame implements KeyListener, Commons {
 				RobotSpaceship r = robot_spaceships.get(n);
 				for(int i=r.getProjectiles().size()-1; i>=0; i--) {
 					Projectile p = r.getProjectiles().get(i);
-					Point sp = new Point((int)user_spaceship.get_x(), (int)user_spaceship.get_y());
+					Point sp = new Point((int)user_spaceship.getX(), (int)user_spaceship.getY());
 					Point pp = new Point((int)p.get_x(), (int)p.get_y());
 					if(sp.distance(pp) <= 20) {
 						user_spaceship.setEnergy(user_spaceship.getEnergy()-p.getDamage());
@@ -378,9 +382,10 @@ public class SpaceWars extends JFrame implements KeyListener, Commons {
 		for(int n = 0; n < packs.size(); n++) {
 			try{
 				EnergyPack p = (EnergyPack) packs.get(n);
-				Point sp = new Point((int)user_spaceship.get_x(), (int)user_spaceship.get_y());
-				Point pp = new Point((int)p.get_x(), (int)p.get_y());
+				Point sp = new Point((int)user_spaceship.getX(), (int)user_spaceship.getY());
+				Point pp = new Point((int)p.getX(), (int)p.getY());
 				if(sp.distance(pp) <= 30){
+					System.out.println("ENERGY");
 					user_spaceship.setEnergy(user_spaceship.getEnergy()+p.getAmount());
 					if(user_spaceship.getEnergy()>user_spaceship.getMaxEnergy())
 						user_spaceship.setEnergy(user_spaceship.getMaxEnergy());
@@ -388,10 +393,11 @@ public class SpaceWars extends JFrame implements KeyListener, Commons {
 				}
 			} catch(ClassCastException ex) {
 				ProjectilePack p = (ProjectilePack) packs.get(n);
-				Point sp = new Point((int)user_spaceship.get_x(), (int)user_spaceship.get_y());
-				Point pp = new Point((int)p.get_x(), (int)p.get_y());
+				Point sp = new Point((int)user_spaceship.getX(), (int)user_spaceship.getY());
+				Point pp = new Point((int)p.getX(), (int)p.getY());
 				if(sp.distance(pp) <= 30){
-					user_spaceship.set_ammo(user_spaceship.get_ammo()+p.getAmount());
+					System.out.println("AMMO");
+					user_spaceship.setAmmo(user_spaceship.getAmmo()+p.getAmount());
 					packs.remove(p);
 				}
 			}
@@ -446,7 +452,7 @@ public class SpaceWars extends JFrame implements KeyListener, Commons {
                     // show ammo
                     graphics.setColor(Color.WHITE);
                     graphics.setFont(new Font("Arial", 20, 30));
-                    graphics.drawString("Ammo: " + user_spaceship.get_ammo(), 10, 575);
+                    graphics.drawString("Ammo: " + user_spaceship.getAmmo(), 10, 575);
                     graphics.setColor(Color.WHITE);
                     graphics.setFont(new Font("Arial", 20, 30));
                     graphics.drawString("Rockets: " + user_spaceship.getrockets(), 10, 540);

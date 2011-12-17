@@ -17,7 +17,7 @@ public class Projectile {
 	}
 	
 	public void draw(Graphics graphics, Color color){
-		
+		System.out.println("AQUI!!!!!!!!!!!!!!!!!");
 	}
 	
 	public void move(){

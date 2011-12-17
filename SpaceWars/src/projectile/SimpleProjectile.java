@@ -10,6 +10,7 @@ public class SimpleProjectile extends Projectile {
 		// TODO Auto-generated constructor stub
 	}
 
+	@Override
 	public void draw(Graphics g, Color color)
         {
             g.setColor(color);

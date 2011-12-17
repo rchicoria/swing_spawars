@@ -10,12 +10,13 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
 import projectile.Projectile;
+import projectile.ProjectileFactory;
 import projectile.SimpleProjectile;
 
 public class Spaceship
 {
     float x, y;                     // Spaceship's center x and y
-    float angle_degrees;            // Spaceship's direction
+    float angleDegrees;            // Spaceship's direction
     float angle_inc;                // Spaceship's direction increment
     float speed;                    // Spaceship's speed
     float speedX, speedY;           // Spaceship's speed per step in x and y
@@ -25,6 +26,7 @@ public class Spaceship
     double[] acceleration_vector;
     float radius;                   // Spaceship's radius
     Color color;                    // Spaceship's color
+    ProjectileFactory projectileFactory;
     
     float[][] shape = new float[8][2];
 
@@ -34,7 +36,9 @@ public class Spaceship
     protected int max_energy;
     protected int energy;
     
-    ArrayList<double[]> oldPos = new ArrayList<double[]>();
+    protected int simpleProjectilesDamage;
+
+	ArrayList<double[]> oldPos = new ArrayList<double[]>();
 
    // For collision detection and response
    // Maintain the response of the earliest collision detected 
@@ -45,7 +49,7 @@ public class Spaceship
    {
       this.x = x;
       this.y = y;
-      this.angle_degrees = angleInDegree;
+      this.angleDegrees = angleInDegree;
       this.speed = speed;
       this.speedX = (float)(speed * Math.cos(Math.toRadians(angleInDegree)));
       this.speedY = (float)(-speed * Math.sin(Math.toRadians(angleInDegree)));
@@ -57,6 +61,7 @@ public class Spaceship
       this.angle_inc = 10;
       this.energy = energy;
       this.max_energy = energy;
+      this.projectileFactory = new ProjectileFactory(this);
       set(this.x,this.y);
    }
    
@@ -189,7 +194,7 @@ public class Spaceship
         shape[7][1] = y+y_offset;
 
         for(int i = 0; i < 7; i++)
-            shape[i] = movePoint(shape[i], shape[7], this.angle_degrees);
+            shape[i] = movePoint(shape[i], shape[7], this.angleDegrees);
     }
 
     private float[] movePoint(float[] point, float[] origin, float angle)
@@ -209,12 +214,12 @@ public class Spaceship
 
    public void rotate(int direction)
    {
-        this.angle_degrees += this.angle_inc*direction;
-        if(this.angle_degrees<0)
-            this.angle_degrees = 360+this.angle_degrees;
-        this.angle_degrees = this.angle_degrees % 360;
-        this.speedX = (float)(speed * Math.cos(Math.toRadians(this.angle_degrees)));
-        this.speedY = (float)(-speed * Math.sin(Math.toRadians(this.angle_degrees)));
+        this.angleDegrees += this.angle_inc*direction;
+        if(this.angleDegrees<0)
+            this.angleDegrees = 360+this.angleDegrees;
+        this.angleDegrees = this.angleDegrees % 360;
+        this.speedX = (float)(speed * Math.cos(Math.toRadians(this.angleDegrees)));
+        this.speedY = (float)(-speed * Math.sin(Math.toRadians(this.angleDegrees)));
    }
 
     /**
@@ -226,8 +231,8 @@ public class Spaceship
         //System.out.println("========= UP ============== [" + this.speed +"]");
         if(this.speed<this.max_speed)
         {
-            this.acceleration_vector[0] = (double)(this.acceleration*Math.cos(Math.toRadians(this.angle_degrees)));
-            this.acceleration_vector[1] = (double)(this.acceleration*Math.sin(Math.toRadians(this.angle_degrees)));
+            this.acceleration_vector[0] = (double)(this.acceleration*Math.cos(Math.toRadians(this.angleDegrees)));
+            this.acceleration_vector[1] = (double)(this.acceleration*Math.sin(Math.toRadians(this.angleDegrees)));
             logspeed(true,this.speed,this.speedX,this.speedY);
             this.speedX += (float)(this.acceleration_vector[0]);
             this.speedY -= (float)(this.acceleration_vector[1]);
@@ -245,8 +250,8 @@ public class Spaceship
         //System.out.println("======== DOWN ============= [" + this.speed +"]");
         if(this.speed>-this.max_speed/2)
         {
-            this.acceleration_vector[0] = (double)(this.acceleration*Math.cos(Math.toRadians(this.angle_degrees+180)));
-            this.acceleration_vector[1] = (double)(this.acceleration*Math.sin(Math.toRadians(this.angle_degrees+180)));
+            this.acceleration_vector[0] = (double)(this.acceleration*Math.cos(Math.toRadians(this.angleDegrees+180)));
+            this.acceleration_vector[1] = (double)(this.acceleration*Math.sin(Math.toRadians(this.angleDegrees+180)));
             logspeed(true,this.speed,this.speedX,this.speedY);
             this.speedX += 2*(float)(this.acceleration_vector[0]);
             this.speedY -= 2*(float)(this.acceleration_vector[1]);
@@ -271,7 +276,7 @@ public class Spaceship
                 theta = 360 + theta;
         }
 
-        if(Math.abs(this.angle_degrees-theta)>100)
+        if(Math.abs(this.angleDegrees-theta)>100)
             return true;
         return false;
     }
@@ -340,11 +345,11 @@ public class Spaceship
      * SimpleProjectile
      */
 
-    public void fire_projectiles()
+    public void fireProjectile(RobotSpaceship target)
     {
         try
         {
-            SimpleProjectile sp = new SimpleProjectile(x, y, Math.toRadians(this.angle_degrees), 5);
+            Projectile sp = projectileFactory.createProjectile(target);
             projectiles.add(sp);
         }
         catch ( ConcurrentModificationException e) { }
@@ -467,8 +472,28 @@ public class Spaceship
         
     }
 
-    public float get_x() { return this.x; }
-    public float get_y() { return this.y; }
-    public float get_direction() { return this.angle_degrees; }
-    public float get_direction_radians() { return (float)Math.toRadians(this.angle_degrees); }
+    public float getX() { return this.x; }
+    public float getY() { return this.y; }
+    public float getDirection() { return this.angleDegrees; }
+    public float get_direction_radians() { return (float)Math.toRadians(this.angleDegrees); }
+    
+    
+    public Color getSimpleProjectileColor() {
+		return simpleProjectileColor;
+	}
+	public void setSimpleProjectileColor(Color simpleProjectileColor) {
+		this.simpleProjectileColor = simpleProjectileColor;
+	}
+	public int getSimpleProjectilesDamage() {
+		return simpleProjectilesDamage;
+	}
+	public void setSimpleProjectilesDamage(int simpleProjectilesDamage) {
+		this.simpleProjectilesDamage = simpleProjectilesDamage;
+	}
+	public float getAngleDegrees() {
+		return angleDegrees;
+	}
+	public void setAngleDegrees(float angleDegrees) {
+		this.angleDegrees = angleDegrees;
+	}
 }

@@ -1,5 +1,6 @@
 package spaceship;
 
+import game.Commons;
 import game.ContainerBox;
 
 import java.awt.Color;
@@ -19,6 +20,7 @@ public class RobotSpaceship extends Spaceship {
 		super(x, y,  radius, speed,angleInDegree, color,energy);
 		this.color = Color.green;
 		this.simpleProjectileColor = Color.YELLOW;
+		this.simpleProjectilesDamage = Commons.ROBOT_SPACESHIP_SIMPLE_PROJECTILES_DAMAGE;
 		// TODO Auto-generated constructor stub
 	}
 	
@@ -61,12 +63,12 @@ public class RobotSpaceship extends Spaceship {
         public void rotate()
         {
             Random r = new Random();
-            this.angle_degrees += 2*this.angle_inc*r.nextInt(3)- 1;
-            if(this.angle_degrees<0)
-                this.angle_degrees = 360+this.angle_degrees;
-            this.angle_degrees = this.angle_degrees % 360;
-            this.speedX = (float)(speed * Math.cos(Math.toRadians(this.angle_degrees)));
-            this.speedY = (float)(-speed * Math.sin(Math.toRadians(this.angle_degrees)));
+            this.angleDegrees += 2*this.angle_inc*r.nextInt(3)- 1;
+            if(this.angleDegrees<0)
+                this.angleDegrees = 360+this.angleDegrees;
+            this.angleDegrees = this.angleDegrees % 360;
+            this.speedX = (float)(speed * Math.cos(Math.toRadians(this.angleDegrees)));
+            this.speedY = (float)(-speed * Math.sin(Math.toRadians(this.angleDegrees)));
         }
 	
 	protected void drawProjectiles(Graphics graphics) {

@@ -24,6 +24,8 @@ public interface Commons {
     public static final int USER_SPACESHIP_ENERGY = 100;
     public static final int USER_SPACESHIP_AMMO = 200;
     public static final int USER_SPACESHIP_ROCKETS = 3;
+    public static final int USER_SPACESHIP_SIMPLE_PROJECTILES_DAMAGE = 30;
+    public static final int USER_SPACESHIP_ROCKETS_DAMAGE = 100;
 
     public static final int ROBOT_SPACESHIP_RADIUS = 20;
     public static final int ROBOT_SPACESHIP_INIT_SPEED = 2;
@@ -31,6 +33,7 @@ public interface Commons {
     public static final Color ROBOT_SPACESHIP_COLOR = Color.GREEN;
     public static final int ROBOT_SPACESHIP_ENERGY = 100;
     public static final double ROBOT_SPACESHIP_FIRE_RATE = 0.15;
+    public static final int ROBOT_SPACESHIP_SIMPLE_PROJECTILES_DAMAGE = 5;
 
     public static final int ENERGY_PACK = 30;
     public static final double ENERGY_PACK_RATE = 0.0003;
@@ -43,4 +46,6 @@ public interface Commons {
     public static final int KEY_RIGHT = KeyEvent.VK_RIGHT;
     public static final int KEY_AMMO = KeyEvent.VK_SPACE;
     public static final int KEY_ROCKET = KeyEvent.VK_C;
+    
+    public static final double PI = 3.14159;
 }

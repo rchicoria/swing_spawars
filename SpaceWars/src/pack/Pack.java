@@ -40,19 +40,19 @@ public class Pack {
 		this.amount = amount;
 	}
 
-	public double get_x() {
+	public double getX() {
 		return x;
 	}
 
-	public void set_x(double x) {
+	public void setX(double x) {
 		this.x = x;
 	}
 
-	public double get_y() {
+	public double getY() {
 		return y;
 	}
 
-	public void set_y(double y) {
+	public void setY(double y) {
 		this.y = y;
 	}
 
