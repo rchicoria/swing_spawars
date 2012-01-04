@@ -1,23 +1,32 @@
 package projectile;
 
+import game.Commons;
 import java.awt.Color;
 import java.awt.Graphics;
 
-public class Projectile {
+public class Projectile implements Commons
+{
 	protected float x;
 	protected float y;
 	protected double direction;
 	protected int damage;
-	
-	public Projectile(float x, float y, double direction, int damage){
+        protected Color color;
+
+        public Projectile()
+        {
+            color = Color.WHITE;
+        }
+        
+	public Projectile(float x, float y, double direction)
+        {
 		this.x = x;
 		this.y = y;
 		this.direction = direction;
-		this.damage = damage;
+                color = Color.WHITE;
 	}
 	
-	public void draw(Graphics graphics, Color color){
-		System.out.println("AQUI!!!!!!!!!!!!!!!!!");
+	public void draw(Graphics graphics){
+		
 	}
 	
 	public void move(){

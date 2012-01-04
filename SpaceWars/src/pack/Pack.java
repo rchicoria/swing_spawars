@@ -2,58 +2,56 @@ package pack;
 
 import game.ContainerBox;
 import java.awt.Color;
-import java.awt.Graphics;
+import java.awt.Point;
 import java.util.Random;
+import spaceship.UserSpaceship;
 
-public class Pack {
-
-	protected double x;
-	protected double y;
+public class Pack
+{
+        protected Point coords;
+        protected int radius;
 	protected Color color;
-	protected int amount;
 	protected int timeRemaining;
+        protected UserPackStrategy strategy;
 	
-	int[][] pos = new int[4][2];
 	
-	public Pack(int amount)
+	public Pack(Color color, int time)
 	{
 		Random r = new Random();
-		this.x = r.nextInt(ContainerBox.getInstance().get_maxX()-100)+50;
-		this.y = r.nextInt(ContainerBox.getInstance().get_maxY()-100)+50;
-		this.amount = amount;
-		this.timeRemaining = 150;
+		int x = r.nextInt(ContainerBox.getInstance().get_maxX()-100)+50;
+		int y = r.nextInt(ContainerBox.getInstance().get_maxY()-100)+50;
+                this.coords = new Point(x,y);
+                this.color = color;
+		this.timeRemaining = time;
+                this.radius = 30;
 	}
+
+        public void setStrategy(UserPackStrategy s)
+        {
+            this.strategy = s;
+        }
+
+        public void activate(UserSpaceship spaceship)
+        {
+            this.strategy.activate(spaceship);
+        }
+
+        public boolean intersect(int x, int y)
+        {
+            Point object = new Point(x, y);
+            if(coords.distance(object)<=30)
+                return true;
+            return false;
+        }
 	
-	public int getTimeRemaining() {
-		return timeRemaining;
+	public int getTimeRemaining()
+        {
+            return timeRemaining;
 	}
 
-	public void setTimeRemaining(int timeRemaining) {
-		this.timeRemaining = timeRemaining;
-	}
-
-	public int getAmount() {
-		return amount;
-	}
-
-	public void setAmount(int amount) {
-		this.amount = amount;
-	}
-
-	public double getX() {
-		return x;
-	}
-
-	public void setX(double x) {
-		this.x = x;
-	}
-
-	public double getY() {
-		return y;
-	}
-
-	public void setY(double y) {
-		this.y = y;
+	public void setTimeRemaining(int timeRemaining)
+        {
+            this.timeRemaining = timeRemaining;
 	}
 
 	public Color getColor() {
@@ -64,17 +62,14 @@ public class Pack {
 		this.color = color;
 	}
 
-	public int[][] getPos() {
-		return pos;
-	}
+        public Point getCoords() {
+            return coords;
+        }
 
-	public void setPos(int[][] pos) {
-		this.pos = pos;
-	}
+        public int getRadius() {
+            return radius;
+        }
 
-	public void draw(Graphics graphics){
-		graphics.setColor(color);
-		graphics.fillOval((int)x, (int)y, 30, 30);
-		graphics.drawOval((int)x, (int)y, 30, 30);
-	}
+
+
 }

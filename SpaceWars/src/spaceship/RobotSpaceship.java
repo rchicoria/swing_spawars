@@ -1,27 +1,22 @@
 package spaceship;
 
-import game.Commons;
-import game.ContainerBox;
 
 import java.awt.Color;
-import java.awt.Graphics;
-import java.util.ConcurrentModificationException;
 import java.util.Random;
 
-import projectile.SimpleProjectile;
 
 public class RobotSpaceship extends Spaceship {
 
 	private double currentProb;
-	private boolean fireActive = true;
+	private boolean fireActive = false;
 
 	public RobotSpaceship(float x, float y, float radius, float speed, float angleInDegree, Color color,
-            int energy) {
-		super(x, y,  radius, speed,angleInDegree, color,energy);
-		this.color = Color.green;
+            int energy, int ammoDamage) {
+		super(x, y,  radius, speed,angleInDegree, color,energy, ammoDamage);
+		this.color = color;
 		this.simpleProjectileColor = Color.YELLOW;
-		this.simpleProjectilesDamage = Commons.ROBOT_SPACESHIP_SIMPLE_PROJECTILES_DAMAGE;
-		// TODO Auto-generated constructor stub
+		this.ammoDamage = ammoDamage;
+                System.out.println("( " + x + ", " + y + " )");
 	}
 	
 	public void changeDirection(){
@@ -60,17 +55,18 @@ public class RobotSpaceship extends Spaceship {
 		set(x,y);*/
 	}
 
-        public void rotate()
-        {
-            Random r = new Random();
-            this.angleDegrees += 2*this.angle_inc*r.nextInt(3)- 1;
-            if(this.angleDegrees<0)
-                this.angleDegrees = 360+this.angleDegrees;
-            this.angleDegrees = this.angleDegrees % 360;
-            this.speedX = (float)(speed * Math.cos(Math.toRadians(this.angleDegrees)));
-            this.speedY = (float)(-speed * Math.sin(Math.toRadians(this.angleDegrees)));
-        }
-	
+    public void rotate()
+    {
+        Random r = new Random();
+        this.angleDegrees += 2*this.angle_inc*r.nextInt(3)- 1;
+        if(this.angleDegrees<0)
+            this.angleDegrees = 360+this.angleDegrees;
+        this.angleDegrees = this.angleDegrees % 360;
+        this.speedX = (float)(speed * Math.cos(Math.toRadians(this.angleDegrees)));
+        this.speedY = (float)(-speed * Math.sin(Math.toRadians(this.angleDegrees)));
+    }
+
+    /*
 	protected void drawProjectiles(Graphics graphics) {
 		try {
 			for(int n = 0; n < projectiles.size(); n++) {
@@ -86,7 +82,7 @@ public class RobotSpaceship extends Spaceship {
 				}
 			}
 		} catch ( ConcurrentModificationException e) { }
-	}
+	}*/
 
 	public double getCurrentProb() {
 		return currentProb;

@@ -1,22 +1,24 @@
 package projectile;
 
-import java.awt.Color;
+import game.ContainerBox;
 import java.awt.Graphics;
  
-public class SimpleProjectile extends Projectile {
+public class SimpleProjectile extends Projectile{
 
-	public SimpleProjectile(float x, float y, double direction, int damage) {
-		super(x, y, direction, damage);
-		// TODO Auto-generated constructor stub
-	}
+    
+    public SimpleProjectile(float x, float y, double direction, int damage)
+    {
+        super(x, y, direction);
+        this.damage = damage;
+    }
 
-	@Override
-	public void draw(Graphics g, Color color)
-        {
-            g.setColor(color);
-            g.fillOval((int)x, (int)y, 5, 5);
-            g.drawOval((int)x, (int)y, 5, 5);
-	}
+    @Override
+    public void draw(Graphics g)
+    {
+        g.setColor(color);
+        g.fillOval((int)x, (int)y, 5, 5);
+        g.drawOval((int)x, (int)y, 5, 5);
+    }
  
     @Override
     public void move()
@@ -26,6 +28,12 @@ public class SimpleProjectile extends Projectile {
 
         x += dx;
         y -= dy;
+    }
+
+    public boolean isOutOfBorders()
+    {
+        ContainerBox box = ContainerBox.getInstance();
+        return x>box.get_maxX() || x<box.get_minX() || y>box.get_maxY() || y<box.get_minY();
     }
  
 }

@@ -4,57 +4,80 @@ import game.Commons;
 
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.event.KeyEvent;
-import java.util.ArrayList;
-import java.util.ConcurrentModificationException;
+import projectile.Projectile;
 
-import projectile.RocketProjectile;
 
-public class UserSpaceship extends Spaceship {
-	
-	protected int ammo;
-	protected int rockets;
-	protected int rocketsDamage;
+public class UserSpaceship extends Spaceship
+{
+    protected int ammo;
+    protected int rockets;
+    protected int rocketsDamage;
+    protected int hyperspace;
+    protected State state;
+    
 
-	protected ArrayList<RocketProjectile> guidedProjectiles;
-
-    public UserSpaceship(float x, float y, float radius, float speed, float angleInDegree, Color color, int energy, int ammo, int rockets) {
-		super(x, y,  radius, speed,angleInDegree, color,energy);
-		this.ammo = ammo;
-		this.rockets = rockets;
-		this.color = Color.RED;
-		this.simpleProjectileColor = Color.WHITE;
-		this.guidedProjectiles = new ArrayList<RocketProjectile>();
-		this.simpleProjectilesDamage = Commons.USER_SPACESHIP_SIMPLE_PROJECTILES_DAMAGE;
-		this.rocketsDamage = Commons.USER_SPACESHIP_ROCKETS_DAMAGE;
-		// TODO Auto-generated constructor stub
-	}
-	
-	public ArrayList<RocketProjectile> getGuidedProjectiles() {
-		return guidedProjectiles;
-	}
-	
-	public void draw(Graphics graphics){
-		super.draw(graphics);
-		//drawGuidedProjectiles(graphics);
-	}
-
-	@Override
-    public void fireProjectile(RobotSpaceship target)
+    public UserSpaceship(float x, float y, float radius, float speed, float angleInDegree, Color color, int energy, int ammo, int ammoDamage, int rockets, int hyperspace)
     {
-        if(ammo>0)
-            super.fireProjectile(target);
+        super(x, y,  radius, speed,angleInDegree, color,energy, ammoDamage);
+        this.ammo = ammo;
+        this.rockets = rockets;
+        this.color = Color.RED;
+        this.simpleProjectileColor = Color.WHITE;
+        this.state = new StateDefault();
+        this.hyperspace = hyperspace;
     }
-	public void setGuidedProjectiles(ArrayList<RocketProjectile> guidedProjectiles) {
-		this.guidedProjectiles = guidedProjectiles;
-	}
 
-	public void fireGuidedProjectile(RobotSpaceship target) {
-		try {
-			System.out.println(target);
-			guidedProjectiles.add(new RocketProjectile(shape[1][0], shape[1][1], angleDegrees, 50, target));
-		} catch ( ConcurrentModificationException e) { }
-	}
+     public int getHyperspace() {
+        return hyperspace;
+    }
+
+    public void setHyperspace(int hyperspace) {
+        this.hyperspace = hyperspace;
+    }
+
+    public boolean hyper()
+    {
+        if(hyperspace>0)
+        {
+            hyperspace--;
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public void takeDamage(int damage) {
+        this.state.takeDamage(this, damage);
+    }
+
+    public State getState() {
+        return state;
+    }
+
+    public void setState(State state) {
+        this.state = state;
+    }
+
+
+    @Override
+    public Projectile fireProjectile(RobotSpaceship target)
+    {
+        if(target != null && rockets > 0)
+        {
+            rockets--;
+            Projectile p = projectileFactory.createPack("rocket", this, target);
+            p.set_x(x);
+            p.set_y(y);
+            return p;
+        }
+        else if(target==null && ammo>0)
+        {
+            ammo--;
+            return super.fireProjectile(target);
+        }
+        return null;
+    }
+    
 	
 //	protected void drawGuidedProjectiles(Graphics graphics) {
 //		try {
@@ -71,12 +94,12 @@ public class UserSpaceship extends Spaceship {
 //	}
 
 	public int getAmmo() {
-		return ammo;
+            return ammo;
 	}
 
-	public void setAmmo(int ammo) {
-		if(ammo>=0)
-                    this.ammo = ammo;
+	public void setAmmo(int ammo)
+        {
+            this.ammo = ammo;
 	}
 	
 	public int getrockets() {
@@ -86,40 +109,10 @@ public class UserSpaceship extends Spaceship {
 	public void setrockets(int rockets) {
 		this.rockets = rockets;
 	}
-
-
-
-
-    public void keyPressed(KeyEvent e)
-    {
-        int key = e.getKeyCode();
-
-        if (key == KeyEvent.VK_LEFT) {
-            rotate(1);
-        }
-
-        if (key == KeyEvent.VK_RIGHT) {
-            rotate(-1);
-        }
-
-        if (key == KeyEvent.VK_UP) {
-            speed_up();
-        }
-
-        if (key == KeyEvent.VK_DOWN) {
-            speed_down();
-        }
-    }
-
-	public int getRocketsDamage() {
-		return rocketsDamage;
+	
+	@Override
+	public Color getColor() {
+		return this.getState().getColor();
 	}
-
-	public void setRocketsDamage(int rocketsDamage) {
-		this.rocketsDamage = rocketsDamage;
-	}
-    
-    
-
 
 }

@@ -24,7 +24,7 @@ public class ContainerBox {
     public void set(int x, int y, int width, int height) {
         minX = x;
         minY = y;
-        maxX = x + width - 1;
+        maxX = x + width;
         maxY = y + height - 1;
     }
 
